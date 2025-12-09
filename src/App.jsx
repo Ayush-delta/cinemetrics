@@ -77,7 +77,7 @@ const App = () => {
       if (movies.ok) {
         const data = await movies.json();
 
-        const mapped = (data.results || []).map(m => ({
+        const mapped = (data.results || []).slice(0, 5).map((m) => ({
         ...m,
         poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : '/no-movie.png'
       }));
