@@ -36,14 +36,15 @@ Create a `.env` file:
 ---
 
 ## 📂 Project Structure
+src/
+│── App.jsx
+│── MovieCard.jsx
+│── appwrite.js
+│── assets/
+│── components/
+│── styles/
+└── ...
 
-├── App.jsx # Main component (trending & search logic)
-├── appwrite.js # Appwrite client & database functions
-├── index.css # Tailwind + custom styles
-├── main.jsx # React entry point
-└── index.html # Root HTML
-
----
 
 ## 🎯 How It Works
 
