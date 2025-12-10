@@ -36,6 +36,8 @@ Create a `.env` file:
 ---
 
 ## 📂 Project Structure
+
+```
 src/
 │── App.jsx
 │── MovieCard.jsx
@@ -45,6 +47,7 @@ src/
 │── styles/
 └── ...
 
+```
 
 
 ## 🎯 How It Works
