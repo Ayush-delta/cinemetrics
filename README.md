@@ -47,7 +47,7 @@ Create a `.env` file:
 4. **Run the app**
 
 ```
-npm run dev 
+npm run dev
 
 ```
 
