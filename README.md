@@ -27,15 +27,32 @@ A responsive React application that displays trending movies using the TMDB API 
 
 1. **Clone and install**
 
-2. **Set up environment variables**
+```
+git clone https://github.com/Ayush-delta/trending-movies-app.git
+cd trending-movies-app
+
+```
+
+2. **Install dependencies**
+```
+npm install
+
+```
+
+
+3. **Set up environment variables**
 
 Create a `.env` file:
 
-3. **Run the app**
+4. **Run the app**
 
----
+```
+npm run dev 
 
-## 📂 Project Structure
+```
+
+5. ## 📂 Project Structure
+```
 src/
 │── App.jsx
 │── MovieCard.jsx
@@ -44,9 +61,10 @@ src/
 │── components/
 │── styles/
 └── ...
+```
 
 
-## 🎯 How It Works
+6. ## 🎯 How It Works
 
 - **Trending Section**: Fetches top 5 weekly trending movies from TMDB
 - **Search**: Type to search movies; results update in real-time
