@@ -52,6 +52,7 @@ npm run dev
 ```
 
 ## 📂 Project Structure
+```
 src/
 │── App.jsx
 │── MovieCard.jsx
@@ -60,7 +61,7 @@ src/
 │── components/
 │── styles/
 └── ...
-
+```
 
 6. ## 🎯 How It Works
 
