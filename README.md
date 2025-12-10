@@ -46,6 +46,7 @@ src/
 └── ...
 
 
+
 ## 🎯 How It Works
 
 - **Trending Section**: Fetches top 5 weekly trending movies from TMDB
