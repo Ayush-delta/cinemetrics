@@ -160,3 +160,7 @@
     display: none;
   }
 }
+
+.hero-img {
+  @apply w-[200px] h-[300px] object-cover rounded-xl shadow-lg;
+}
