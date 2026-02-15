@@ -1,16 +1,18 @@
 # 🎬 Trending Movies App
 
-A responsive React application that displays trending movies using the TMDB API with real-time search functionality.
+A responsive React application that displays trending movies using the TMDB API with real-time search functionality, infinite scrolling, and immersive movie details.
 
 ---
 
 ## ✨ Features
 
-- Real-time trending movies from TMDB API
-- Search movies with live results
-- Fully responsive design (mobile to desktop)
-- Clean UI with ratings, language, and release year
-- Modern styling with Tailwind CSS and custom gradients
+- **🔥 Real-time Trending**: Displays top weekly trending movies from TMDB.
+- **🔎 Live Search**: Instant search results as you type.
+- **🎥 Interactive Details**: Click any movie to open a rich modal with backstory, cast, and trailer.
+- **🔄 Infinite Discovery**: "Load More" functionality for endless browsing.
+- **💀 Smart Loading**: Polished skeleton screens for a premium loading experience.
+- **📱 Fully Responsive**: Optimized for mobile, tablet, and desktop.
+- **🎨 Modern UI**: Glassmorphism effects, smooth animations, and a custom dark theme.
 
 ---
 
@@ -19,7 +21,8 @@ A responsive React application that displays trending movies using the TMDB API 
 - **Frontend**: React + Vite
 - **Styling**: Tailwind CSS
 - **API**: TMDB (The Movie Database)
-- **Backend**: Appwrite (for search tracking)
+- **Backend**: Appwrite (for search analytics)
+- **Icons**: Heroicons / Lucide React
 
 ---
 
@@ -27,47 +30,62 @@ A responsive React application that displays trending movies using the TMDB API 
 
 1. **Clone and install**
 
-```
-git clone https://github.com/Ayush-delta/trending-movies-app.git
-cd trending-movies-app
-
+```bash
+git clone https://github.com/Ayush-delta/cinemetrics.git
+cd cinemetrics
 ```
 
 2. **Install dependencies**
-```
+
+```bash
 npm install
-
 ```
-
 
 3. **Set up environment variables**
 
-Create a `.env` file:
+Create a `.env` file in the root directory and add your TMDB API key:
+
+```env
+VITE_TMDB_API_KEY=your_api_key_here
+```
 
 4. **Run the app**
 
-```
+```bash
 npm run dev
-
 ```
+
+---
 
 ## 📂 Project Structure
-```
+
+```bash
 src/
-│── App.jsx
-│── MovieCard.jsx
-│── appwrite.js
-│── assets/
-│── components/
-│── styles/
-└── ...
+├── components/
+│   ├── MovieCard.jsx       # Individual movie display component
+│   ├── MovieDetails.jsx    # Modal for extended movie info (Cast, Trailer)
+│   ├── Search.jsx          # Search input component with debounce
+│   ├── SkeletonCard.jsx    # Loading state placeholder
+│   └── Spinner.jsx         # Loading spinner
+├── App.jsx                 # Main application logic
+├── appwrite.js             # Appwrite configuration for analytics
+├── index.css               # Global styles and Tailwind directives
+└── main.jsx                # Entry point
 ```
 
-6. ## 🎯 How It Works
+---
 
-- **Trending Section**: Fetches top 5 weekly trending movies from TMDB
-- **Search**: Type to search movies; results update in real-time
-- **Responsive Grid**: Adapts from 1 to 4 columns based on screen size
+## 🎯 How It Works
+
+- **Trending Section**: Fetches and showcases the top 5 weekly trending movies.
+- **Search**: Users can search for any movie; results update in real-time.
+- **Movie Details**: Clicking a card opens a modal with:
+    - High-res backdrop
+    - Rating, Runtime, and Year
+    - Genres
+    - Cast members with photos
+    - Official YouTube Trailer
+- **Pagination**: The "Load More" button fetches the next page of results, appending them to the list.
 
 ---
 
