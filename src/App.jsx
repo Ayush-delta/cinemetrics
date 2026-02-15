@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import Search from './components/search.jsx';
 import Spinner from './components/Spinner.jsx';
 import MovieCard from './components/MovieCard.jsx';
+import MovieDetails from './components/MovieDetails.jsx';
+import SkeletonCard from './components/SkeletonCard.jsx';
 import { useDebounce } from "react-use";
 import { updateSearchCount } from './appwrite.js';
 //define API base URL and options
@@ -24,7 +26,11 @@ const App = () => {
   const [movieList, setMovieList] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
   const [isTrendingLoading, setIsTrendingLoading] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // debounce the search term to prevent making too many API calls
   // waiting for the user to stop typing for 500 milliseconds
@@ -32,14 +38,18 @@ const App = () => {
     setDebouncedSearchTerm(searchTerm)
     , 500, [searchTerm]);
 
-  const fetchMovies = async (query = '') => {
-    setIsLoading(true);
+  const fetchMovies = async (query = '', pageNumber = 1) => {
+    if (pageNumber === 1) {
+      setIsLoading(true);
+    } else {
+      setIsLoadingMore(true);
+    }
     setErrorMessage('');
 
     try {
       const endpoint = query ?
-        `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}` :
-        `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+        `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}&page=${pageNumber}` :
+        `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&page=${pageNumber}`;
       const response = await fetch(endpoint, API_OPTIONS);
 
       if (!response.ok) {
@@ -54,7 +64,11 @@ const App = () => {
         return;
       }
 
-      setMovieList(data.results || []);
+      if (pageNumber === 1) {
+        setMovieList(data.results || []);
+      } else {
+        setMovieList((prev) => [...prev, ...(data.results || [])]);
+      }
 
       if (query && data.results.length > 0) {
         await updateSearchCount(query, data.results[0]);
@@ -64,6 +78,7 @@ const App = () => {
       setErrorMessage('Error fetching movies. Please try again later.');
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   }
 
@@ -93,8 +108,15 @@ const App = () => {
   };
 
   useEffect(() => {
-    fetchMovies(debouncedSearchTerm);
+    setPage(1);
+    fetchMovies(debouncedSearchTerm, 1);
   }, [debouncedSearchTerm]);
+
+  const loadMoreMovies = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchMovies(debouncedSearchTerm, nextPage);
+  };
 
   useEffect(() => {
     fetchTrendingMovies();
@@ -171,18 +193,40 @@ const App = () => {
           <h2>All Movies</h2>
 
           {isLoading ? (
-            <Spinner />
+            <ul>
+              {Array.from({ length: 12 }).map((_, idx) => (
+                <SkeletonCard key={idx} />
+              ))}
+            </ul>
           ) : errorMessage ? (
             <p className='text-red-500'>{errorMessage}</p>
           ) : (
             <ul>
               {movieList.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+                <MovieCard key={movie.id} movie={movie} onClick={setSelectedMovie} />
               ))}
             </ul>
           )}
+
+          {movieList.length > 0 && !isLoading && !errorMessage && (
+            <div className="flex justify-center mt-8">
+              {isLoadingMore ? (
+                <Spinner />
+              ) : (
+                <button
+                  onClick={loadMoreMovies}
+                  className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full transition-all duration-300 backdrop-blur-sm border border-white/10 shadow-lg hover:scale-105 active:scale-95"
+                >
+                  Load More
+                </button>
+              )}
+            </div>
+          )}
         </section>
       </div>
+      {selectedMovie && (
+        <MovieDetails movie={selectedMovie} onClose={() => setSelectedMovie(null)} />
+      )}
     </main>
   )
 }
