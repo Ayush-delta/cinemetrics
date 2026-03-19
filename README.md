@@ -17,8 +17,7 @@
 
 **CineMetrics** is a next-generation movie discovery platform providing seamless exploration of cinema. It integrates real-time data from the TMDB API, offering a highly responsive, cinematic, and personalized user experience without the noise of typical web apps.
 
-![CineMetrics Mockup Dashboard](./public/CineMetrics.png) 
-*(Insert your own screenshot here!)*
+![CineMetrics Mockup Dashboard](./public/Web-page.png) 
 
 ---
 
