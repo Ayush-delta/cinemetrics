@@ -6,7 +6,7 @@ import Watchlist from './pages/Watchlist.jsx';
 
 const App = () => {
   return (
-    <main className="min-h-screen bg-gray-900 overflow-x-hidden pt-4 pb-12">
+    <main className="overflow-x-hidden pt-4 pb-12">
       <div className="pattern" />
       <div className="wrapper max-w-7xl mx-auto flex flex-col items-center">
         <Navbar />
