@@ -8,7 +8,7 @@
   [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](#)
   [![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](#)
   
-  [**Live Demo**](https://cinemetrics-demo.xyz) • [**Report Bug**](#)
+  [**Live Demo**](https://movies26.netlify.app/) • [**Report Bug**](#)
 </div>
 
 <br />
