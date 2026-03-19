@@ -14,10 +14,10 @@ const FilterBar = ({ filters, setFilters }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-4 mb-8 p-4 bg-gray-800/50 backdrop-blur-md rounded-2xl border border-white/10 justify-center items-center shadow-lg">
+    <div className="flex flex-wrap gap-4 mb-8 p-4 bg-light-100/5 backdrop-blur-md rounded-2xl border border-white/10 justify-center items-center shadow-lg">
       <div className="flex flex-col">
         <label className="text-xs text-gray-400 mb-1 ml-1">Genre</label>
-        <select name="genre" value={filters.genre} onChange={handleChange} className="bg-gray-900 text-gray-200 p-2.5 rounded-xl outline-none border border-gray-700 focus:border-indigo-500 transition-colors cursor-pointer min-w-[140px]">
+        <select name="genre" value={filters.genre} onChange={handleChange} className="bg-dark-100 text-gray-200 p-2.5 rounded-xl outline-none border border-gray-700 focus:border-indigo-500 transition-colors cursor-pointer min-w-[140px]">
           <option value="">All Genres</option>
           {genres.map(g => (
             <option key={g.id} value={g.id}>{g.name}</option>
@@ -27,7 +27,7 @@ const FilterBar = ({ filters, setFilters }) => {
 
       <div className="flex flex-col">
         <label className="text-xs text-gray-400 mb-1 ml-1">Release Year</label>
-        <select name="year" value={filters.year} onChange={handleChange} className="bg-gray-900 text-gray-200 p-2.5 rounded-xl outline-none border border-gray-700 focus:border-indigo-500 transition-colors cursor-pointer min-w-[140px]">
+        <select name="year" value={filters.year} onChange={handleChange} className="bg-dark-100 text-gray-200 p-2.5 rounded-xl outline-none border border-gray-700 focus:border-indigo-500 transition-colors cursor-pointer min-w-[140px]">
           <option value="">All Years</option>
           <option value="2020-2029">2020s</option>
           <option value="2010-2019">2010s</option>
@@ -39,7 +39,7 @@ const FilterBar = ({ filters, setFilters }) => {
 
       <div className="flex flex-col">
         <label className="text-xs text-gray-400 mb-1 ml-1">Rating</label>
-        <select name="rating" value={filters.rating} onChange={handleChange} className="bg-gray-900 text-gray-200 p-2.5 rounded-xl outline-none border border-gray-700 focus:border-indigo-500 transition-colors cursor-pointer min-w-[140px]">
+        <select name="rating" value={filters.rating} onChange={handleChange} className="bg-dark-100 text-gray-200 p-2.5 rounded-xl outline-none border border-gray-700 focus:border-indigo-500 transition-colors cursor-pointer min-w-[140px]">
           <option value="">Any Rating</option>
           <option value="8">8+ ⭐</option>
           <option value="7">7+ ⭐</option>
