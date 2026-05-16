@@ -6,6 +6,8 @@
 
 **A premium movie & TV discovery platform built with React 19 + Vite + Tailwind CSS v4**
 
+**[🌍 View Live Demo](https://cinemetrics-r5gp-ayushs-projects-3f2f45db.vercel.app/)**
+
 [![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-7-purple?logo=vite)](https://vitejs.dev/)
 [![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5-red)](https://tanstack.com/query)
