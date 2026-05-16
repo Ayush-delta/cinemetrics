@@ -1,234 +1,144 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
+import {
+  getTrendingMovies,
+  getPopularMovies,
+  getTopRatedMovies,
+  getNowPlayingMovies,
+  discoverMovies,
+  searchMovies,
+} from '../api/movies';
+import HeroBanner from '../components/media/HeroBanner';
+import MediaGrid from '../components/media/MediaGrid';
+import MediaCard from '../components/media/MediaCard';
+import Tabs from '../components/filters/Tabs';
+import FilterBar from '../components/filters/FilterBar';
+import SearchBar from '../components/filters/SearchBar';
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
 import { useDebounce } from '../hooks/useDebounce';
-import { fetchMovies, fetchTrending, fetchPopular, fetchTopRated, fetchNowPlaying } from '../services/api';
-import Search from '../components/search.jsx';
-import Spinner from '../components/Spinner.jsx';
-import MovieCard from '../components/MovieCard.jsx';
-import SkeletonCard from '../components/SkeletonCard.jsx';
-import Tabs from '../components/Tabs.jsx';
-import FilterBar from '../components/FilterBar.jsx';
-import { useNavigate } from 'react-router-dom';
+
+const HOME_TABS = [
+  { id: 'trending', label: '🔥 Trending' },
+  { id: 'popular', label: '⭐ Popular' },
+  { id: 'top_rated', label: '🏆 Top Rated' },
+  { id: 'now_playing', label: '🎬 Now Playing' },
+];
+
+const DEFAULT_FILTERS = { genre: '', year: '', rating: '', sortBy: 'popularity.desc', runtime: '' };
 
 const Home = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
+  const debouncedSearch = useDebounce(searchQuery, 400);
+  const [activeTab, setActiveTab] = useState('trending');
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const { recentlyViewed } = useRecentlyViewed();
 
-  const [activeTab, setActiveTab] = useState('Trending');
-  const [timeWindow, setTimeWindow] = useState('day');
-  
-  const [filters, setFilters] = useState({ genre: '', year: '', rating: '' });
-  
-  const [movies, setMovies] = useState([]);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [error, setError] = useState('');
-  const [hasMore, setHasMore] = useState(true);
+  // Hero: trending week
+  const { data: heroData } = useQuery({
+    queryKey: ['trending-movies-week'],
+    queryFn: ({ signal }) => getTrendingMovies('week', 1, signal),
+    staleTime: 10 * 60 * 1000,
+  });
+  const heroItems = heroData?.results?.slice(0, 10) || [];
 
-  const navigate = useNavigate();
+  const hasFilters = filters.genre || filters.year || filters.rating || filters.runtime ||
+    filters.sortBy !== 'popularity.desc';
 
-  const loadMovies = useCallback(async (isLoadMore = false) => {
-    const currentPage = isLoadMore ? page + 1 : 1;
-    if (!isLoadMore) {
-      setIsLoading(true);
-      setPage(1);
-      setMovies([]);
-    } else {
-      setIsLoadingMore(true);
+  // Compute grid query props
+  let gridKey, gridFn;
+
+  if (debouncedSearch) {
+    gridKey = ['search-movies', debouncedSearch];
+    gridFn = ({ pageParam }) => searchMovies(debouncedSearch, pageParam);
+  } else if (hasFilters) {
+    gridKey = ['discover-movies', filters];
+    gridFn = ({ pageParam }) => discoverMovies({ ...filters, page: pageParam });
+  } else {
+    switch (activeTab) {
+      case 'trending':
+        gridKey = ['trending-movies', 'week'];
+        gridFn = ({ pageParam }) => getTrendingMovies('week', pageParam);
+        break;
+      case 'top_rated':
+        gridKey = ['top-rated-movies'];
+        gridFn = ({ pageParam }) => getTopRatedMovies(pageParam);
+        break;
+      case 'now_playing':
+        gridKey = ['now-playing-movies'];
+        gridFn = ({ pageParam }) => getNowPlayingMovies(pageParam);
+        break;
+      default:
+        gridKey = ['popular-movies'];
+        gridFn = ({ pageParam }) => getPopularMovies(pageParam);
     }
-    setError('');
-
-    try {
-      let data;
-      const abortController = new AbortController();
-      const hasFilters = filters.genre || filters.year || filters.rating;
-
-      if (debouncedSearchTerm) {
-        data = await fetchMovies(debouncedSearchTerm, currentPage, {}, abortController.signal);
-      } else if (hasFilters) {
-        data = await fetchMovies('', currentPage, filters, abortController.signal);
-      } else {
-        switch (activeTab) {
-          case 'Trending':
-            data = await fetchTrending(timeWindow);
-            setHasMore(false);
-            break;
-          case 'Popular':
-            data = await fetchPopular(currentPage);
-            setHasMore(data.page < data.total_pages);
-            break;
-          case 'Top Rated':
-            data = await fetchTopRated(currentPage);
-            setHasMore(data.page < data.total_pages);
-            break;
-          case 'Now Playing':
-            data = await fetchNowPlaying(currentPage);
-            setHasMore(data.page < data.total_pages);
-            break;
-          default:
-            data = await fetchPopular(currentPage);
-        }
-      }
-
-      if (data && data.results) {
-        if (isLoadMore) {
-          setMovies(prev => [...prev, ...data.results]);
-          setPage(currentPage);
-        } else {
-          setMovies(data.results);
-          if (activeTab === 'Trending' && !hasFilters && !debouncedSearchTerm) {
-            setHasMore(false);
-          } else {
-            setHasMore(data.page < data.total_pages);
-          }
-        }
-      } else {
-        if (!isLoadMore) setMovies([]);
-      }
-    } catch (err) {
-      if (err.name !== 'AbortError') setError(err.message || 'Failed to fetch movies');
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, [debouncedSearchTerm, activeTab, timeWindow, filters, page]);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    
-    const fetchCurrentState = async () => {
-      setIsLoading(true);
-      setError('');
-      setPage(1);
-      
-      try {
-        let data;
-        const hasFilters = filters.genre || filters.year || filters.rating;
-
-        if (debouncedSearchTerm) {
-          data = await fetchMovies(debouncedSearchTerm, 1, {}, abortController.signal);
-        } else if (hasFilters) {
-          data = await fetchMovies('', 1, filters, abortController.signal);
-        } else {
-          switch (activeTab) {
-            case 'Trending':
-              data = await fetchTrending(timeWindow);
-              break;
-            case 'Popular':
-              data = await fetchPopular(1);
-              break;
-            case 'Top Rated':
-              data = await fetchTopRated(1);
-              break;
-            case 'Now Playing':
-              data = await fetchNowPlaying(1);
-              break;
-            default:
-              data = await fetchPopular(1);
-          }
-        }
-
-        if (data && data.results) {
-          setMovies(data.results);
-          if (activeTab === 'Trending' && !hasFilters && !debouncedSearchTerm) {
-            setHasMore(false);
-          } else {
-            setHasMore(data.page < data.total_pages);
-          }
-        } else {
-          setMovies([]);
-        }
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          setError(err.message || 'Failed to fetch movies');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCurrentState();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [debouncedSearchTerm, activeTab, timeWindow, filters]);
-
-  const handleMovieClick = (movie) => {
-    navigate(`/movie/${movie.id}`);
-  };
-
-  const isSearchOrFilter = debouncedSearchTerm || filters.genre || filters.year || filters.rating;
+  }
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <header className="w-full text-center mt-6">
-        <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6">
-          Find <span className="text-white">Movies</span> You'll Enjoy Without the Hassle
-        </h1>
-        <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      </header>
+    <>
+      <Helmet>
+        <title>CineMetrics — Discover Movies &amp; TV Shows</title>
+        <meta name="description" content="Discover trending movies and TV shows, build your watchlist, and explore by genre, rating, and more." />
+        <meta property="og:title" content="CineMetrics" />
+        <meta property="og:description" content="Your premium movie & TV discovery platform." />
+      </Helmet>
 
-      <div className="w-full max-w-6xl mt-8 px-4">
-        {!debouncedSearchTerm && (
+      {/* Hero banner (not during search) */}
+      {!debouncedSearch && heroItems.length > 0 && (
+        <HeroBanner items={heroItems} mediaType="movie" />
+      )}
+
+      <main className="wrapper py-8 page-enter">
+        {/* Search bar */}
+        <div className="mb-8">
+          <SearchBar placeholder="Search movies, TV shows, people..." />
+        </div>
+
+        {/* Recently viewed */}
+        {!debouncedSearch && recentlyViewed.length > 0 && (
+          <section className="mb-10">
+            <h2 className="section-title text-xl font-bold text-white mb-5">Continue Watching</h2>
+            <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-3">
+              {recentlyViewed.slice(0, 12).map((item, i) => (
+                <div key={item.id} className="flex-shrink-0 w-[130px] sm:w-[150px]">
+                  <MediaCard item={item} index={i} mediaType={item.title ? 'movie' : 'tv'} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Tabs + Filters (not during search) */}
+        {!debouncedSearch && (
           <>
-            <Tabs activeTab={activeTab} setActiveTab={setActiveTab} timeWindow={timeWindow} setTimeWindow={setTimeWindow} />
-            <FilterBar filters={filters} setFilters={setFilters} />
+            <div className="mb-5">
+              <Tabs tabs={HOME_TABS} activeTab={activeTab} onChange={(tab) => { setActiveTab(tab); setFilters(DEFAULT_FILTERS); }} />
+            </div>
+            {activeTab !== 'trending' && (
+              <FilterBar filters={filters} setFilters={setFilters} />
+            )}
           </>
         )}
 
-        {isSearchOrFilter && !isLoading && movies.length > 0 && (
-          <h2 className="text-2xl font-bold text-white mb-6">
-            {debouncedSearchTerm ? `Search Results for "${debouncedSearchTerm}"` : 'Filtered Results'}
-          </h2>
-        )}
+        {/* Section title */}
+        <h2 className="section-title text-xl font-bold text-white mb-6">
+          {debouncedSearch
+            ? `Results for "${debouncedSearch}"`
+            : HOME_TABS.find((t) => t.id === activeTab)?.label || 'Discover'}
+        </h2>
 
-        {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {Array.from({ length: 10 }).map((_, idx) => (
-              <SkeletonCard key={idx} />
-            ))}
-          </div>
-        ) : error ? (
-          <div className="text-center p-8 bg-red-500/10 border border-red-500/20 rounded-2xl">
-            <p className="text-red-400 text-lg">{error}</p>
-            <button 
-              onClick={() => loadMovies(false)}
-              className="mt-4 px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors font-medium border border-red-400"
-            >
-              Retry
-            </button>
-          </div>
-        ) : movies.length === 0 ? (
-          <div className="text-center p-12 bg-white/5 border border-white/10 rounded-2xl flex flex-col items-center justify-center">
-            <svg className="w-16 h-16 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <h3 className="text-2xl text-gray-300 font-medium mb-2">No movies found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters.</p>
-          </div>
-        ) : (
-          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {movies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} onClick={handleMovieClick} />
-            ))}
-          </ul>
-        )}
-
-        {movies.length > 0 && !isLoading && hasMore && (
-          <div className="flex justify-center mt-12 mb-8">
-            {isLoadingMore ? (
-              <Spinner />
-            ) : (
-              <button
-                onClick={() => loadMovies(true)}
-                className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] transition-all duration-300 active:scale-95 border border-indigo-400"
-              >
-                Load More
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+        {/* Grid */}
+        <MediaGrid
+          key={JSON.stringify(gridKey)}
+          queryKey={gridKey}
+          queryFn={gridFn}
+          mediaType="movie"
+          emptyMessage={debouncedSearch ? `No results found for "${debouncedSearch}".` : 'No movies found.'}
+        />
+      </main>
+    </>
   );
 };
 
