@@ -21,7 +21,7 @@ export const getOnAirTV = (page = 1, signal) =>
 
 /** @param {number|string} id */
 export const getTVDetails = (id, signal) =>
-  tmdbFetch(`/tv/${id}`, { append_to_response: 'videos,credits,recommendations,similar' }, signal);
+  tmdbFetch(`/tv/${id}`, { append_to_response: 'videos,credits,recommendations,similar,reviews' }, signal);
 
 /** @param {number|string} id */
 export const getTVSeasonDetails = (tvId, seasonNumber, signal) =>

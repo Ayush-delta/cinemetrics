@@ -137,7 +137,35 @@ const Home = () => {
           mediaType="movie"
           emptyMessage={debouncedSearch ? `No results found for "${debouncedSearch}".` : 'No movies found.'}
         />
-      </main>
+        {/* Now in Cinemas Teaser */}
+      <section className="wrapper mb-16 sm:mb-24">
+        <div className="relative rounded-3xl overflow-hidden glass-dark border border-white/10 p-8 sm:p-12 flex flex-col md:flex-row items-center gap-8 justify-between">
+          <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at right, rgba(124, 58, 237, 0.4), transparent 50%)' }} />
+          <div className="relative z-10 max-w-xl text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider mb-4">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              Now in Cinemas
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">Experience the Magic on the Big Screen</h2>
+            <p className="text-slate-300 text-lg mb-8">
+              Find showtimes, book tickets, and experience the latest blockbusters in IMAX and Dolby Cinema near you.
+            </p>
+            <button className="btn bg-white text-black hover:bg-slate-200 border-none font-bold px-8 py-3 text-lg transition-transform hover:scale-105">
+              Find Theaters Near Me
+            </button>
+          </div>
+          <div className="relative z-10 w-full md:w-1/2 max-w-md aspect-video rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group cursor-pointer">
+            <div className="absolute inset-0 bg-slate-800 flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center">
+               <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors duration-500" />
+               <div className="w-16 h-16 rounded-full bg-red-500/90 text-white flex items-center justify-center backdrop-blur-md shadow-[0_0_30px_rgba(239,68,68,0.6)] group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
     </>
   );
 };

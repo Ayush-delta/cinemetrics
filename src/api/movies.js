@@ -66,7 +66,7 @@ export const searchMovies = (query, page = 1, signal) =>
 
 /** @param {number|string} id */
 export const getMovieDetails = (id, signal) =>
-  tmdbFetch(`/movie/${id}`, { append_to_response: 'videos,credits,recommendations,similar,images' }, signal);
+  tmdbFetch(`/movie/${id}`, { append_to_response: 'videos,credits,recommendations,similar,images,reviews' }, signal);
 
 /** @param {number|string} id */
 export const getMovieRecommendations = (id, page = 1, signal) =>
@@ -76,3 +76,9 @@ export const getMovieRecommendations = (id, page = 1, signal) =>
 
 export const getMovieGenres = (signal) =>
   tmdbFetch('/genre/movie/list', {}, signal);
+
+// ─── Collections ─────────────────────────────────────────────────────────────
+
+/** @param {number|string} id */
+export const getCollectionDetails = (id, signal) =>
+  tmdbFetch(`/collection/${id}`, {}, signal);
